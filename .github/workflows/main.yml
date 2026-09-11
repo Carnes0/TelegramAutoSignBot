@@ -2,7 +2,9 @@ name: Telegram Auto Sign
 
 on:
   schedule:
-    - cron: '0 0 * * *'
+    # GitHub Actions cron uses UTC.
+    # 23:13 UTC = 07:13 Beijing time (UTC+8) on the next day.
+    - cron: '13 23 * * *'
   workflow_dispatch:
 
 permissions:
