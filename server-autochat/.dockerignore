@@ -1,6 +1,0 @@
-*
-!requirements.txt
-!autochat/
-!autochat/**
-**/__pycache__/
-**/*.pyc
