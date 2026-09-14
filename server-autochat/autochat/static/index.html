@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Telegram AutoChat · 管理面板</title>
+  <link rel="stylesheet" href="/static/style.css"><script src="/static/app.js" defer></script>
+</head>
+<body>
+  <div id="toast" role="status" aria-live="polite" hidden></div>
+  <section id="login-view" class="login-wrap">
+    <form id="login-form" class="login-card">
+      <div class="brand-mark">↗</div><p class="eyebrow">TELEGRAM AUTOCHAT</p>
+      <h1>让对话，自然继续。</h1><p class="muted">登录你的自动群聊管理面板。</p>
+      <label for="password">管理密码</label><input id="password" type="password" autocomplete="current-password" required placeholder="输入部署时设置的密码">
+      <button class="primary full" type="submit">进入管理面板 <span>→</span></button>
+      <p id="login-error" class="error" role="alert"></p>
+      <p class="small muted">每天 08:00 开始 · 每半小时一次 · 最多 15 条</p>
+    </form>
+  </section>
+  <div id="dashboard" hidden>
+    <aside class="sidebar">
+      <div class="brand"><span class="brand-mark small-mark">↗</span><div>AutoChat<small>TELEGRAM ASSISTANT</small></div></div>
+      <nav aria-label="主导航"><a href="#overview" class="active">◫ <span>运行概览</span></a><a href="#configuration">⚙ <span>连接与配置</span></a><a href="#history">≡ <span>发送记录</span></a></nav>
+      <div class="sidebar-foot"><span class="dot"></span> 你的服务器，你的控制权<button id="logout" class="text-button">退出登录 ↗</button></div>
+    </aside>
+    <main>
+      <header><div><p class="eyebrow">WORKSPACE / OVERVIEW</p><h1>自动群聊工作台</h1><p class="muted">跟上群聊语境，让每一句都恰到好处。</p></div><div class="clock"><span class="dot"></span><span id="server-time">正在同步时间</span><small>北京时间 UTC+8</small></div></header>
+      <section id="overview" class="hero"><div><span id="run-badge" class="badge">已暂停</span><h2 id="run-title">准备好，再开始聊天。</h2><p id="run-description">先完成连接配置，预览回复后即可启用。</p><p id="worker-error" class="error"></p></div><div class="hero-actions"><button id="enable" class="primary">启用自动回复 ↗</button><button id="pause" class="secondary">暂停</button></div></section>
+      <section class="stats" aria-label="运行统计"><article><p>今日已发送</p><div><strong id="sent-count">0</strong><span>/ 15 条</span></div><progress id="sent-progress" max="15" value="0"></progress></article><article><p>回复间隔</p><div><strong>30</strong><span>分钟</span></div><small>按实际发送时间保持间隔</small></article><article><p>每日工作时段</p><div><strong class="time-value">08:00 — 15:00</strong></div><small>错过的时段不会集中补发</small></article></section>
+      <section class="content-grid">
+        <article id="configuration" class="card"><div class="card-head"><div><p class="eyebrow">CONNECTION</p><h2>连接与配置</h2></div><span class="tag">单群模式</span></div>
+          <form id="settings-form"><div class="fields-two"><div><label for="api-id">Telegram API ID</label><input id="api-id" name="api_id" inputmode="numeric" placeholder="例如 12345678"></div><div><label for="api-hash">API Hash <span id="api-hash-state"></span></label><input id="api-hash" name="api_hash" type="password" autocomplete="new-password" placeholder="32 位 API Hash"></div></div>
+            <label for="session-string">Telegram Session <span id="session-string-state"></span></label><input id="session-string" name="session_string" type="password" autocomplete="new-password" placeholder="粘贴 StringSession；已保存时留空保留"><p class="field-hint">使用服务器专用 Session。可按 README 在终端生成。</p>
+            <div class="form-divider"></div><label for="deepseek-key">DeepSeek API Key <span id="deepseek-api-key-state"></span></label><input id="deepseek-key" name="deepseek_api_key" type="password" autocomplete="new-password" placeholder="输入你的 DeepSeek API Key">
+            <div class="fields-two"><div><label for="model">模型名称</label><input id="model" name="model" value="deepseek-flash"></div><div><label for="target">目标群组</label><input id="target" name="target" placeholder="-100… 或 @群用户名"></div></div>
+            <p class="field-hint">最近两小时内最多 20 条有效聊天文字会提交给 DeepSeek。回复限制为 5–10 个汉字。</p>
+            <div class="form-actions"><button type="submit" class="primary">保存配置</button><button id="load-groups" type="button" class="secondary">读取我的群组</button></div><p class="field-hint">保存后会暂停自动回复；确认配置后重新启用。</p>
+            <div id="group-picker" hidden><label for="groups">选择已加入的群组</label><select id="groups"><option value="">请选择</option></select></div>
+          </form>
+        </article>
+        <div class="right-stack"><article class="card preview-card"><p class="eyebrow">REPLY PREVIEW</p><h2>先看看，它会怎么聊。</h2><p class="muted">读取当前群聊语境，生成一句简短回复。</p><div class="chat-preview"><div class="chat-avatar">↗</div><div><span class="chat-name">AutoChat <small>预览</small></span><div id="preview-text" class="bubble">你的下一句，来自当下的对话。</div><p id="preview-meta" class="field-hint">点击下方按钮生成预览</p></div></div><button id="preview" class="secondary full">生成回复预览 ↗</button><p class="small muted">仅生成，不发送；会调用 DeepSeek API。</p></article>
+          <article class="card rules-card"><p class="eyebrow">HOW IT WORKS</p><h2>有节奏，也有分寸。</h2><div class="rule"><span>01</span><p>先理解上下文<small>过滤签到命令、机器人和自己的消息。</small></p></div><div class="rule"><span>02</span><p>只说一句短话<small>检查字数与重复内容，合格后才发送。</small></p></div><div class="rule"><span>03</span><p>没有新话题就等待<small>安静时跳过，不为凑次数连续发言。</small></p></div></article>
+        </div>
+      </section>
+      <section id="uncertain-box" class="notice" hidden><h3>有一条消息的发送结果需要核查</h3><p>请先在 Telegram 查看是否已发送。核查后解除保护，不会重发这条消息。</p><button id="resolve" class="secondary">我已核查，解除保护</button></section>
+      <section id="history" class="card"><div class="card-head"><div><p class="eyebrow">ACTIVITY</p><h2>今日发送记录</h2></div><span class="muted small">每 10 秒自动更新</span></div><div class="table-wrap"><table><thead><tr><th>计划时间</th><th>状态</th><th>发送完成</th><th>说明</th></tr></thead><tbody id="records"></tbody></table></div><div id="empty-history" class="empty"><span>◷</span><p>今天还没有运行记录</p><small>启用后，到达下一个回复时段会自动开始。</small></div></section>
+      <footer>Telegram AutoChat <span>北京时间 · 5–10 字 · 每天最多 15 次</span></footer>
+    </main>
+  </div>
+</body></html>
